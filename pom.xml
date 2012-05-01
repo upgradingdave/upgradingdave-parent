@@ -1,0 +1,217 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.upgradingdave</groupId>
+  <artifactId>upgradingdave-parent</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0-SNAPSHOT</version>
+
+  <organization>
+    <name>UpgradingDave</name>
+    <url>http://upgradingdave.com/</url>
+  </organization>
+
+  <repositories>
+  </repositories>
+
+  <pluginRepositories>
+  </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <id>upgradingdave-release</id>
+      <name>Upgradingdave Release Repository</name>
+      <url>https://artifactory.upgradingdave.com/libs-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>upgradingdave-snapshots</id>
+      <name>Upgradingdave Snapshot Repository</name>
+      <url>https://artifactory.upgradingdave.com/libs-snapshot-local</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- plugin versions -->
+    <bundle-plugin.version>2.3.6</bundle-plugin.version>
+    <compiler-plugin.version>2.3.2</compiler-plugin.version>
+    <enforcer-plugin.version>1.0.1</enforcer-plugin.version>
+    <jetty-plugin.version>6.1.10</jetty-plugin.version>
+
+    <!-- logging versions-->
+    <log4j.version>1.2.16</log4j.version>
+    <org.slf4j.version>1.6.1</org.slf4j.version>
+
+    <!-- dependency Versions -->
+    <jetty.version>7.6.3.v20120416</jetty.version>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${enforcer-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>enforce-versions</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[3.0.3,4.0.0)</version>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>[1.7.0,)</version>
+                </requireJavaVersion>
+                <!--
+                    <requireOS>
+                    <family>unix</family>
+                    </requireOS>
+                -->
+              </rules>
+            </configuration>
+          </execution>
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <!-- Doesn't exclude on its own, but does check that it is excluded -->
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>commons-logging:commons-logging</exclude>
+                    <exclude>commons-logging:commons-logging-api</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+          <execution>
+            <id>enforce</id>
+            <configuration>
+              <rules>
+                <DependencyConvergence/>
+              </rules>
+            </configuration>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${compiler-plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${bundle-plugin.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Import-Package><![CDATA[
+            *
+            ]]>
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>maven-jetty-plugin</artifactId>
+          <version>${jetty-plugin.version}</version>
+          <configuration>
+            <scanIntervalSeconds>10</scanIntervalSeconds>
+            <stopKey>close</stopKey>
+            <stopPort>9999</stopPort>
+          </configuration>
+          <executions>
+            <execution>
+              <id>start-jetty</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+                <scanIntervalSeconds>0</scanIntervalSeconds>
+                <daemon>true</daemon>
+              </configuration>
+            </execution>
+            <execution>
+              <id>stop-jetty</id>
+              <phase>post-integration-test</phase>
+              <goals>
+                <goal>stop</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+  </build>
+
+  <dependencies>
+    <!-- Logging Dependencies -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${org.slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>${org.slf4j.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${org.slf4j.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${log4j.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+	<groupId>org.eclipse.jetty</groupId>
+	<artifactId>jetty-servlet</artifactId>
+	<version>${jetty.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>
