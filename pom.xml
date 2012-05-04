@@ -34,6 +34,10 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <!--extension versions -->
+    <archetype.version>2.2</archetype.version>
+    <wagon-ssh.version>2.2</wagon-ssh.version>
+
     <!-- plugin versions -->
     <archetype-plugin.version>2.2</archetype-plugin.version>
     <bundle-plugin.version>2.3.6</bundle-plugin.version>
@@ -50,6 +54,18 @@
   </properties>
 
   <build>
+    <extensions>
+      <extension>
+	<groupId>org.apache.maven.wagon</groupId>
+	<artifactId>wagon-ssh</artifactId>
+	<version>${wagon-ssh.version}</version>
+      </extension>
+      <extension>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-packaging</artifactId>
+        <version>${archetype.version}</version>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
