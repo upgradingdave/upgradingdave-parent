@@ -13,21 +13,53 @@
   </organization>
 
   <repositories>
+    <!-- Override (disable) central -->
+    <repository>
+      <id>central</id>
+      <url>http://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>upgradingdave-ro</id>
+      <name>Upgradingdave Artifactory</name>
+      <url>http://dev.upgradingdave.com/artifactory/repo</url>
+    </repository>
   </repositories>
 
   <pluginRepositories>
+    <!-- Override (disable) central -->
+    <pluginRepository>
+      <id>central</id>
+      <url>http://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </pluginRepository>
+    <pluginRepository>
+      <id>upgradingdave-ro</id>
+      <name>Upgradingdave Read Only</name>
+      <url>http://dev.upgradingdave.com/artifactory/repo</url>
+    </pluginRepository>
   </pluginRepositories>
 
   <distributionManagement>
     <repository>
       <id>upgradingdave-release</id>
       <name>Upgradingdave Release Repository</name>
-      <url>https://artifactory.upgradingdave.com/libs-release-local</url>
+      <url>http://dev.upgradingdave.com/artifactory/libs-release-local</url>
     </repository>
     <snapshotRepository>
       <id>upgradingdave-snapshots</id>
       <name>Upgradingdave Snapshot Repository</name>
-      <url>https://artifactory.upgradingdave.com/libs-snapshot-local</url>
+      <url>http://dev.upgradingdave.com/artifactory/libs-snapshot-local</url>
     </snapshotRepository>
   </distributionManagement>
 
