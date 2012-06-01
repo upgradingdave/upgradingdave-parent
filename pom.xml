@@ -66,6 +66,21 @@
       <name>Upgradingdave Artifactory</name>
       <url>http://dev.upgradingdave.com/artifactory/repo</url>
     </repository>
+
+    <repository>
+      <id>rubygems-proxy</id>
+      <name>Rubygems Proxy</name>
+      <url>http://rubygems-proxy.torquebox.org/releases</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </repository>
+
   </repositories>
 
   <pluginRepositories>
@@ -212,6 +227,30 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>de.saumya.mojo</groupId>
+          <artifactId>gem-maven-plugin</artifactId>
+          <version>0.28.4</version>
+          <extensions>true</extensions>
+          <configuration>
+            <jrubyVersion>${jruby.version}</jrubyVersion>
+            <gemHome>${project.build.directory}/classes</gemHome>
+            <gemPath>${project.build.directory}/classes</gemPath>
+          </configuration>
+          <executions>
+            <execution>
+              <id>install-gems</id>
+              <goals>
+                <goal>install</goal>
+              </goals>
+              <phase>install</phase>
+              <inherited>true</inherited>
+              <!-- <configuration> -->
+              <!--   <installArgs>sass</installArgs> -->
+              <!-- </configuration> -->
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
           <groupId>org.mortbay.jetty</groupId>
           <artifactId>maven-jetty-plugin</artifactId>
           <version>${jetty-plugin.version}</version>
@@ -319,6 +358,11 @@
         <groupId>jline</groupId>
 	<artifactId>jline</artifactId>
 	<version>${jline.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jruby</groupId>
+        <artifactId>jruby-complete</artifactId>
+        <version>${jruby.version}</version>
       </dependency>
       <dependency>
 	<groupId>org.jruby</groupId>
