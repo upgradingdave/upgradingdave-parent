@@ -12,6 +12,42 @@
     <url>http://upgradingdave.com/</url>
   </organization>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!--extension versions -->
+    <archetype.version>2.2</archetype.version>
+    <wagon-ssh.version>2.2</wagon-ssh.version>
+
+    <!-- plugin versions -->
+    <archetype-plugin.version>2.2</archetype-plugin.version>
+    <bundle-plugin.version>2.3.6</bundle-plugin.version>
+    <compiler-plugin.version>2.3.2</compiler-plugin.version>
+    <enforcer-plugin.version>1.0.1</enforcer-plugin.version>
+    <jetty-plugin.version>6.1.10</jetty-plugin.version>
+
+    <!-- logging versions-->
+    <log4j.version>1.2.16</log4j.version>
+    <org.slf4j.version>1.6.1</org.slf4j.version>
+
+    <!-- test dependency versions -->
+    <junit.version>4.10</junit.version>
+
+    <!-- dependency versions -->
+    <commons-lang.version>2.6</commons-lang.version>
+    <derby.version>10.8.2.2</derby.version>
+    <javax-mail.version>1.4.4</javax-mail.version>
+    <javax.servlet.version>2.5</javax.servlet.version>
+    <jetty.version>7.6.3.v20120416</jetty.version>
+    <jline.version>2.6</jline.version>
+    <jruby.version>1.6.7.2</jruby.version>
+    <jstl.version>1.2</jstl.version>
+    <maven-plugin-api.version>2.0.3</maven-plugin-api.version>
+    <quava.version>11.0.2</quava.version>
+    <spring.version>3.1.0.RELEASE</spring.version>
+    <unboundid-ldapsdk.version>1.1.3</unboundid-ldapsdk.version>
+  </properties>
+
   <repositories>
     <!-- Override (disable) central -->
     <repository>
@@ -62,41 +98,6 @@
       <url>http://dev.upgradingdave.com/artifactory/libs-snapshot-local</url>
     </snapshotRepository>
   </distributionManagement>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <!--extension versions -->
-    <archetype.version>2.2</archetype.version>
-    <wagon-ssh.version>2.2</wagon-ssh.version>
-
-    <!-- plugin versions -->
-    <archetype-plugin.version>2.2</archetype-plugin.version>
-    <bundle-plugin.version>2.3.6</bundle-plugin.version>
-    <compiler-plugin.version>2.3.2</compiler-plugin.version>
-    <enforcer-plugin.version>1.0.1</enforcer-plugin.version>
-    <jetty-plugin.version>6.1.10</jetty-plugin.version>
-
-    <!-- logging versions-->
-    <log4j.version>1.2.16</log4j.version>
-    <org.slf4j.version>1.6.1</org.slf4j.version>
-
-    <!-- test dependency versions -->
-    <junit.version>4.10</junit.version>
-
-    <!-- dependency versions -->
-    <commons-lang.version>2.6</commons-lang.version>
-    <derby.version>10.8.2.2</derby.version>
-    <javax-mail.version>1.4.4</javax-mail.version>
-    <javax.servlet.version>2.5</javax.servlet.version>
-    <jetty.version>7.6.3.v20120416</jetty.version>
-    <jruby.version>1.6.7.2</jruby.version>
-    <jstl.version>1.2</jstl.version>
-    <maven-plugin-api.version>2.0.3</maven-plugin-api.version>
-    <quava.version>11.0.2</quava.version>
-    <spring.version>3.1.0.RELEASE</spring.version>
-    <unboundid-ldapsdk.version>1.1.3</unboundid-ldapsdk.version>
-  </properties>
 
   <build>
     <extensions>
@@ -253,20 +254,8 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>${org.slf4j.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>${org.slf4j.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
@@ -319,6 +308,11 @@
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
         <version>${commons-lang.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>jline</groupId>
+	<artifactId>jline</artifactId>
+	<version>${jline.version}</version>
       </dependency>
       <dependency>
 	<groupId>org.jruby</groupId>
