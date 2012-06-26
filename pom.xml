@@ -242,7 +242,7 @@
               <goals>
                 <goal>install</goal>
               </goals>
-              <phase>install</phase>
+              <phase>generate-sources</phase>
               <inherited>true</inherited>
               <!-- <configuration> -->
               <!--   <installArgs>sass</installArgs> -->
