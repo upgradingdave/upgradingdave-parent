@@ -24,6 +24,7 @@
     <bundle-plugin.version>2.3.6</bundle-plugin.version>
     <compiler-plugin.version>2.3.2</compiler-plugin.version>
     <enforcer-plugin.version>1.0.1</enforcer-plugin.version>
+    <exec-maven-plugin.version>1.2.1</exec-maven-plugin.version>
     <jetty-plugin.version>6.1.10</jetty-plugin.version>
 
     <!-- logging versions-->
@@ -259,27 +260,64 @@
             <stopKey>close</stopKey>
             <stopPort>9999</stopPort>
           </configuration>
-          <executions>
-            <execution>
-              <id>start-jetty</id>
-              <phase>pre-integration-test</phase>
-              <goals>
-                <goal>run</goal>
-              </goals>
-              <configuration>
-                <scanIntervalSeconds>0</scanIntervalSeconds>
-                <daemon>true</daemon>
-              </configuration>
-            </execution>
-            <execution>
-              <id>stop-jetty</id>
-              <phase>post-integration-test</phase>
-              <goals>
-                <goal>stop</goal>
-              </goals>
-            </execution>
-          </executions>
+          <!-- <executions> -->
+          <!--   <execution> -->
+          <!--     <id>start-jetty</id> -->
+          <!--     <phase>pre-integration-test</phase> -->
+          <!--     <goals> -->
+          <!--       <goal>run</goal> -->
+          <!--     </goals> -->
+          <!--     <configuration> -->
+          <!--       <scanIntervalSeconds>0</scanIntervalSeconds> -->
+          <!--       <daemon>true</daemon> -->
+          <!--     </configuration> -->
+          <!--   </execution> -->
+          <!--   <execution> -->
+          <!--     <id>stop-jetty</id> -->
+          <!--     <phase>post-integration-test</phase> -->
+          <!--     <goals> -->
+          <!--       <goal>stop</goal> -->
+          <!--     </goals> -->
+          <!--   </execution> -->
+          <!-- </executions> -->
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>${exec-maven-plugin.version}</version>
+        </plugin>
+        <!-- <plugin> -->
+        <!--   <groupId>org.apache.maven.plugins</groupId> -->
+        <!--   <artifactId>maven-dependency-plugin</artifactId> -->
+        <!--   <executions> -->
+        <!--     <execution> -->
+        <!--       <id>copy-dependencies</id> -->
+        <!--       <phase>prepare-package</phase> -->
+        <!--       <goals> -->
+        <!--         <goal>copy-dependencies</goal> -->
+        <!--       </goals> -->
+        <!--       <configuration> -->
+        <!--         <outputDirectory>${project.build.directory}/lib</outputDirectory> -->
+        <!--         <overWriteReleases>false</overWriteReleases> -->
+        <!--         <overWriteSnapshots>false</overWriteSnapshots> -->
+        <!--         <overWriteIfNewer>true</overWriteIfNewer> -->
+        <!--       </configuration> -->
+        <!--     </execution> -->
+        <!--   </executions> -->
+        <!-- </plugin> -->
+        <!-- <plugin> -->
+        <!--   <groupId>org.apache.maven.plugins</groupId> -->
+        <!--   <artifactId>maven-jar-plugin</artifactId> -->
+        <!--   <configuration> -->
+        <!--     <archive> -->
+        <!--       <manifest> -->
+        <!--         <addClasspath>true</addClasspath> -->
+        <!--         <classpathPrefix>lib/</classpathPrefix> -->
+        <!--         <mainClass>you.main.class</mainClass> -->
+        <!--       </manifest> -->
+        <!--     </archive> -->
+        <!--   </configuration> -->
+        <!-- </plugin> -->
       </plugins>
     </pluginManagement>
 
