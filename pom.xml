@@ -12,6 +12,10 @@
     <url>http://upgradingdave.com/</url>
   </organization>
 
+  <modules>
+    <module>model-fixtures</module>
+  </modules>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -26,6 +30,7 @@
     <enforcer-plugin.version>1.0.1</enforcer-plugin.version>
     <exec-maven-plugin.version>1.2.1</exec-maven-plugin.version>
     <jetty-plugin.version>6.1.10</jetty-plugin.version>
+    <source-plugin.version>2.0.4</source-plugin.version>
 
     <!-- logging versions-->
     <log4j.version>1.2.16</log4j.version>
@@ -147,7 +152,7 @@
                   <version>[3.0.3,4.0.0)</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
-                  <version>[1.7.0,)</version>
+                  <version>[1.6.0,)</version>
                 </requireJavaVersion>
                 <!--
                     <requireOS>
@@ -223,6 +228,21 @@
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-archetype-plugin</artifactId>
         <version>${archetype-plugin.version}</version>
+      </plugin>
+
+      <!-- Use this to create source jar when you deploy to repo -->
+      <!-- Thanks: http://garbuz.com/2010/07/31/maven-2-deploying-project-sources/ -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>${source-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
 
@@ -324,21 +344,6 @@
 
   </build>
 
-  <dependencies>
-    <!-- Logging Dependencies -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${org.slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>${org.slf4j.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
-
   <dependencyManagement>
     <dependencies>
       <!-- Test Dependencies -->
@@ -355,6 +360,24 @@
         <scope>test</scope>
       </dependency>
       <!--END Test Dependencies-->
+
+      <!-- Logging Dependencies -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${org.slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${org.slf4j.version}</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${org.slf4j.version}</version>
+      </dependency>
 
       <!-- Databases -->
       <dependency>
@@ -394,14 +417,14 @@
         <version>${gson.version}</version>
       </dependency>
       <dependency>
-	<groupId>com.beust</groupId>
-	<artifactId>jcommander</artifactId>
-	<version>1.26</version>
+        <groupId>com.beust</groupId>
+        <artifactId>jcommander</artifactId>
+        <version>1.26</version>
       </dependency>
       <dependency>
         <groupId>jline</groupId>
-	<artifactId>jline</artifactId>
-	<version>${jline.version}</version>
+        <artifactId>jline</artifactId>
+        <version>${jline.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jruby</groupId>
@@ -409,9 +432,9 @@
         <version>${jruby.version}</version>
       </dependency>
       <dependency>
-	<groupId>org.jruby</groupId>
-	<artifactId>jruby</artifactId>
-	<version>${jruby.version}</version>
+        <groupId>org.jruby</groupId>
+        <artifactId>jruby</artifactId>
+        <version>${jruby.version}</version>
       </dependency>
 
       <!-- Maven -->
