@@ -77,7 +77,7 @@ public class JsonFixture<T> {
 
         log.info("Attempting to load {} objects from file {}", clazz.getSimpleName().toLowerCase(), fileName);
 
-        final List<T> results = new ArrayList<>();
+        final List<T> results = new ArrayList<T>();
         JsonProcessor<T> jsonProcessor = new JsonProcessor<T>() {
             @Override
             public void process(T object) {
