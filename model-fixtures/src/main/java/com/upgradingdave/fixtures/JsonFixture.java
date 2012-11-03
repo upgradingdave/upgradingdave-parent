@@ -21,18 +21,18 @@ import java.util.List;
 public class JsonFixture<T> {
 
     Logger log = LoggerFactory.getLogger(JsonFixture.class);
-
-    public final static String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public final static String JSON_FILES_DIR = "fixtures";
 
     Class clazz;
     Gson gson;
     String jsonFilesDir;
+    String dateFormat;
 
     public JsonFixture(Class clazz){
 
         this.clazz = clazz;
-        gson = new GsonBuilder().setDateFormat(DATE_FORMAT).create();
+        dateFormat = "yyyy-MM-dd HH:mm:ss";
+        gson = new GsonBuilder().setDateFormat(dateFormat).create();
 
     }
 
@@ -52,6 +52,15 @@ public class JsonFixture<T> {
         } else {
             return jsonFilesDir;
         }
+    }
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+        gson = new GsonBuilder().setDateFormat(dateFormat).create();
     }
 
     public String toJson(T thing) {
@@ -77,7 +86,7 @@ public class JsonFixture<T> {
 
         log.info("Attempting to load {} objects from file {}", clazz.getSimpleName().toLowerCase(), fileName);
 
-        final List<T> results = new ArrayList<>();
+        final List<T> results = new ArrayList<T>();
         JsonProcessor<T> jsonProcessor = new JsonProcessor<T>() {
             @Override
             public void process(T object) {
