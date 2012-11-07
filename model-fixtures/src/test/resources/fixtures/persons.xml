@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persons>
+  <person>
+    <email>bcosby@gmail.com</email>
+    <firstName>Bill</firstName>
+    <lastName>Cosby</lastName>
+    <lastUpdated>2012-07-03 21:06:48</lastUpdated>
+  </person>
+</persons>

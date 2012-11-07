@@ -10,121 +10,53 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Provides convenience methods for managing json files that represent model data. By convention, the methods
- * try to find json files under {@see JSON_FILES_DIR}. Use {@see setFixturesDir} to change this behavior.
+ * try to find json files under {@see Fixture.FIXTURE_DIR}. Use {@see setPathToFixtureFile} to change this behavior.
  *
  */
-public class JsonFixture<T> {
+public class JsonFixture<T> extends Fixture<T> {
 
-    Logger log = LoggerFactory.getLogger(JsonFixture.class);
-    public final static String JSON_FILES_DIR = "fixtures";
-
-    Class clazz;
+    final Logger log = LoggerFactory.getLogger(JsonFixture.class);
     Gson gson;
-    String jsonFilesDir;
-    String dateFormat;
 
-    public JsonFixture(Class clazz){
+    public JsonFixture(Class<T> clazz){
 
-        this.clazz = clazz;
-        dateFormat = "yyyy-MM-dd HH:mm:ss";
-        gson = new GsonBuilder().setDateFormat(dateFormat).create();
+        super(clazz);
+        gson = new GsonBuilder().setDateFormat(getDateFormat()).create();
 
     }
 
-    /**
-     * Use this to change the directory where json files live.
-     */
-    public void setFixturesDir(String jsonFilesDir) {
-
-        this.jsonFilesDir = jsonFilesDir;
-
-    }
-
-    public String getFixturesDir() {
-
-        if(jsonFilesDir == null) {
-            return JSON_FILES_DIR;
-        } else {
-            return jsonFilesDir;
-        }
-    }
-
-    public String getDateFormat() {
-        return dateFormat;
-    }
-
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = dateFormat;
-        gson = new GsonBuilder().setDateFormat(dateFormat).create();
-    }
-
-    public String toJson(T thing) {
+    @Override
+    public String marshal(T thing) {
 
         return gson.toJson(thing);
 
     }
 
-    /**
-     * Build a file name using convention of class(s).json. For example: User.class becomes users.json
-     */
-    public String getJsonFileNameFromClass() {
+    @Override
+    public String marshal(List<T> things) {
 
-        return String.format("fixtures/%ss.json", clazz.getSimpleName().toLowerCase());
+        return gson.toJson(things);
 
     }
 
-    /**
-     * Use this instead of allJsonObjectsFromFile if you want to use a non-standard json file name. For example,
-     * if you'd rather use people.json instead of persons.json.
-     */
-    public List<T> allJsonObjectsFromFile(String fileName) {
+    @Override
+    public T unMarshal(String fixture) {
 
-        log.info("Attempting to load {} objects from file {}", clazz.getSimpleName().toLowerCase(), fileName);
-
-        final List<T> results = new ArrayList<T>();
-        JsonProcessor<T> jsonProcessor = new JsonProcessor<T>() {
-            @Override
-            public void process(T object) {
-                results.add(object);
-            }
-        };
-
-        eachJsonObjectFomFile(fileName, jsonProcessor);
-
-        return results;
+        return gson.fromJson(fixture, clazz);
 
     }
 
-    /**
-     * Try to find a file named class(s).json (users.json, for example), iterate over all json objects
-     * and return complete list
-     */
-    public List<T> allJsonObjectsFromFile() {
-
-        String fileName = getJsonFileNameFromClass();
-        return allJsonObjectsFromFile(fileName);
-
+    @Override
+    protected String getFixtureFileNameFromClass() {
+        return String.format("%ss.json", clazz.getSimpleName().toLowerCase());
     }
 
-    /**
-     * Try to find a file named class(s).json (users.json, for example), iterate over all json objects
-     * and do something with each.
-     */
-    public void withEachJsonObjectFromFile(JsonProcessor<T> processor) {
-
-        eachJsonObjectFomFile(getJsonFileNameFromClass(), processor);
-
-    }
-
-    /**
-     * Read json objects from file, processing each one.
-     */
-    public void eachJsonObjectFomFile(String filePath, JsonProcessor<T> processor){
+    @Override
+    public void eachFixtureFromFile(String filePath, FixtureProcessor<T> processor) {
 
         InputStream in = this.getClass().getClassLoader().getResourceAsStream(filePath);
         JsonReader reader = null;
@@ -141,9 +73,8 @@ public class JsonFixture<T> {
         } catch (IOException e) {
             log.error("Unable to read file {}", filePath, e);
         } catch (NullPointerException e) {
-            log.error("Unable to find file '{}'. Expected to find file inside '{}'. Use setFixturesDir to look" +
-                    " inside a different directory.",
-                    filePath, getFixturesDir());
+            log.error("Unable to find file '{}'. Expected to find file inside '{}'. Use setPathToFixtureFile to look" +
+                    " inside a different directory.", new Object[] {filePath, getPathToFixtureFile()}, e);
         } finally {
             if (reader != null) {
                 try {
@@ -153,12 +84,6 @@ public class JsonFixture<T> {
                 }
             }
         }
-    }
-
-    public interface JsonProcessor<T> {
-
-        public void process(T object);
-
     }
 
 }

@@ -1,0 +1,27 @@
+The model-fixtures library makes it easy to work with test data stored
+in json (or xml).
+
+For example, if you have a Java Bean Class named People, you might
+want to create a file named `people.json` that that contains test data
+representing a bunch of people.
+
+You can then use methods from this library to easy load the json
+defined in `people.json` into a List<People> using the following: 
+
+#+begin_src java
+  JsonFixture<Person> personJsonFixture = new JsonFixture<Person>(Person.class);
+  List<Person> people = personJsonFixture.allFixturesFromFile();
+#+end_src
+
+
+* Release Notes
+
+** 2.0.0
+
+   - Refactor to use Fixture interface
+   - Add ability to use xml fixtures as well as json. 
+
+** 1.0.0
+
+   - simple json fixtures
+
