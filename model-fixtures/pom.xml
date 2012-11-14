@@ -40,6 +40,12 @@
       <artifactId>gson</artifactId>
       <version>2.2.2</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.upgradingdave</groupId>
+      <artifactId>jaxb-tools</artifactId>
+    </dependency>
+
   </dependencies>
 
 </project>
