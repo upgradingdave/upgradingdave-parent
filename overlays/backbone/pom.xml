@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.backbonejs</groupId>
+  <groupId>com.upgradingdave.overlays</groupId>
   <artifactId>backbone</artifactId>
   <name>backbone</name>
   <packaging>war</packaging>

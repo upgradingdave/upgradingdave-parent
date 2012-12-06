@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.jquery</groupId>
+  <groupId>com.upgradingdave.overlays</groupId>
   <artifactId>jquery</artifactId>
   <name>jquery</name>
   <packaging>war</packaging>

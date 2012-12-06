@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>json2</groupId>
+  <groupId>com.upgradingdave.overlays</groupId>
   <artifactId>json2</artifactId>
   <name>json2</name>
   <packaging>war</packaging>
