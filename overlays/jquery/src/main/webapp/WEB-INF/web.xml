@@ -6,26 +6,4 @@
 
   <display-name>jquery</display-name>
 
-  <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-  </welcome-file-list>
-
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:/META-INF/spring/module-context.xml</param-value>
-  </context-param>
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener>
-
-  <servlet>
-    <servlet-name>simpleServlet</servlet-name>
-    <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>simpleServlet</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
-
 </web-app>
