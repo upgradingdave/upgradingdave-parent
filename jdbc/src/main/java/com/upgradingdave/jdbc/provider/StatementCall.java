@@ -1,4 +1,4 @@
-package mil.dfas.persistence.jdbc.provider;
+package com.upgradingdave.jdbc.provider;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
