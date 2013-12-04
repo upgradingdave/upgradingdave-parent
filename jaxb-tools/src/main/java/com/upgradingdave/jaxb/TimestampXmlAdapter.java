@@ -9,6 +9,8 @@ public class TimestampXmlAdapter extends XmlAdapter<String, Timestamp> {
 
     String dateFormat;
 
+    public TimestampXmlAdapter(){}
+
     public TimestampXmlAdapter(String dateFormat) {
         this.dateFormat = dateFormat;
     }
