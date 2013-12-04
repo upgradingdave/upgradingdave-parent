@@ -2,10 +2,6 @@ package com.upgradingdave.models;
 
 import com.upgradingdave.fixtures.FixtureProcessor;
 import com.upgradingdave.fixtures.JsonFixture;
-import com.upgradingdave.models.Model;
-import com.upgradingdave.models.ModelDao;
-import com.upgradingdave.models.PageContext;
-import com.upgradingdave.models.PageImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

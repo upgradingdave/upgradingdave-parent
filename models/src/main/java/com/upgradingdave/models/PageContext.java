@@ -1,9 +1,17 @@
 package com.upgradingdave.models;
 
-public interface PageContext {
+import java.util.List;
 
-    int getPage();
+public interface PageContext<F extends List, S> {
 
-    int getSize();
+  int getPage();
+
+  int getSize();
+
+  S getSortOrder();
+
+  Boolean getSortDirection();
+
+  F getFilters();
 
 }

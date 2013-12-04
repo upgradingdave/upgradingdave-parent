@@ -2,7 +2,9 @@ package com.upgradingdave.models;
 
 public interface Model<ID> {
 
-    ID getId();
+  ID getId();
+
+  void setId(ID id);
 
 }
 
