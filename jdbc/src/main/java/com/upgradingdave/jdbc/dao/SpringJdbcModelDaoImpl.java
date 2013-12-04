@@ -1,6 +1,7 @@
 package com.upgradingdave.jdbc.dao;
 
 import com.upgradingdave.models.Model;
+import com.upgradingdave.models.ModelDao;
 import com.upgradingdave.models.PageContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,14 +12,15 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class ModelDaoImpl<T extends Model, ID> extends JdbcDaoSupport {
+public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDaoSupport implements ModelDao<T, ID> {
 
-  protected static final Logger log = LoggerFactory.getLogger(ModelDaoImpl.class);
+  protected static final Logger log = LoggerFactory.getLogger(SpringJdbcModelDaoImpl.class);
 
-  public ModelDaoImpl(DataSource dataSource) {
+  public SpringJdbcModelDaoImpl(DataSource dataSource) {
     super();
     setDataSource(dataSource);
   }
@@ -27,7 +29,7 @@ public abstract class ModelDaoImpl<T extends Model, ID> extends JdbcDaoSupport {
 
   abstract public String getTableName();
 
-  public T create(T model) throws Exception {
+  public T create(T model) {
 
     log.debug("Attempting to create {}", model);
 
@@ -49,6 +51,7 @@ public abstract class ModelDaoImpl<T extends Model, ID> extends JdbcDaoSupport {
     return model;
   }
 
+  @Override
   public T findById(ID id) {
     log.debug("Attempting to find by id {}", id);
 
@@ -63,7 +66,7 @@ public abstract class ModelDaoImpl<T extends Model, ID> extends JdbcDaoSupport {
 
     log.debug("Attempting to update {}", model);
 
-    String sql = String.format(UpdateUtil.getUpdateSql(getClazz(), Arrays.asList("ID")), getTableName());
+    String sql = String.format(getUpdateSql(getClazz(), Arrays.asList("ID")), getTableName());
 
     SqlParameterSource parameters = new BeanPropertySqlParameterSource(model);
 
@@ -87,5 +90,36 @@ public abstract class ModelDaoImpl<T extends Model, ID> extends JdbcDaoSupport {
   public void delete(T model) {
     log.debug("Attempting to delete {}", model);
     getJdbcTemplate().execute(String.format("DELETE FROM %s WHERE ID = %d", getTableName(), model.getId()));
+  }
+
+  private String getUpdateSql(Class clazz, List<String> whereClauseKeys){
+
+    StringBuilder sqlBuilder = new StringBuilder("UPDATE %s SET ");
+
+    boolean first = true;
+    for (Field field : clazz.getDeclaredFields()) {
+      if (!first) {
+        sqlBuilder.append(", ");
+      }
+      first = false;
+
+      sqlBuilder.append(field.getName().toUpperCase());
+      sqlBuilder.append(" = ?");
+    }
+
+    first = true;
+    for (String key : whereClauseKeys) {
+      if (first) {
+        sqlBuilder.append(" WHERE ");
+      } else {
+        sqlBuilder.append(" AND ");
+      }
+      first = false;
+
+      sqlBuilder.append(key.toUpperCase());
+      sqlBuilder.append(" = ?");
+    }
+
+    return sqlBuilder.toString();
   }
 }
