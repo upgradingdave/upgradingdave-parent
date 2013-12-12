@@ -1,0 +1,16 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <import resource="encryption.xml"/>
+
+  <bean class="org.jasypt.spring31.properties.EncryptablePropertyPlaceholderConfigurer">
+    <constructor-arg ref="configurationEncryptor" />
+    <property name="location" value="classpath:encrypt-test.conf"/>
+  </bean>
+
+  <bean id="simple" class="com.upgradingdave.encryption.EncryptedValue">
+    <constructor-arg name="value" value="${encrypted}"/>
+  </bean>
+
+</beans>

@@ -1,0 +1,67 @@
+** Encryption and Decryption
+
+   To Encrypt/Decrypt values for properties files, download Jasypt
+   1.9.0 from here: 
+   
+   http://sourceforge.net/projects/jasypt/files/jasypt/jasypt%201.9.0/
+
+   Applications each have their own password that they use to
+   decrypt messages at startup. 
+   
+   You'll need to know the password for the app in order to
+   encrypt and/or decrypt messages. 
+
+   Once you have the password, you can use the scripts inside the
+   jasypt installation's bin directory to encrypt and
+   decrypt messages. 
+
+   Currently we're using the `PBEWithMD5AndDES` algorithm to encrypt
+   passwords. 
+
+   So, for example, if the application password is "secret" and you'd like
+   to encrypt the message "4me2know":
+   
+#+begin_src sh
+$ encrypt.sh input='4me2know' password='secret' algorithm='PBEWithMD5AndDES'
+
+
+----ENVIRONMENT-----------------
+
+Runtime: Oracle Corporation Java HotSpot(TM) 64-Bit Server VM 23.3-b01 
+
+
+
+----ARGUMENTS-------------------
+
+input: 4me2know
+password: secret
+
+
+
+----OUTPUT----------------------
+
+Z4ox6oTKnLVhf2Dc5kLLCOMcmsYzXxpY
+#+end_src   
+
+   It's also possible to decrypt like so:
+
+#+begin_src sh
+$ decrypt.sh input=Z4ox6oTKnLVhf2Dc5kLLCOMcmsYzXxpY password=secret
+
+----ENVIRONMENT-----------------
+
+Runtime: Oracle Corporation Java HotSpot(TM) 64-Bit Server VM 23.3-b01 
+
+
+
+----ARGUMENTS-------------------
+
+input: Z4ox6oTKnLVhf2Dc5kLLCOMcmsYzXxpY
+password: secret
+
+
+
+----OUTPUT----------------------
+
+4me2know
+#+end_src
