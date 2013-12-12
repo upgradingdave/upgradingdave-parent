@@ -42,7 +42,19 @@ public class UserAccountDaoTest extends ModelDaoTest<UserAccount, Integer>{
 
   @Test
   public void testFilters(){
-    List<UserAccount> results = userAccountDao.findAll(new PageImpl(0, 10, "username", "username:bcosby"));
+    List<UserAccount> results = userAccountDao.findAll(new PageImpl(0, 10, "username", "username:'bcosby'"));
     assertEquals("bcosby", results.get(0).getUserName());
+  }
+
+  @Test
+  public void testOrder(){
+    PageImpl page = new PageImpl(0, 10);
+    List<UserAccount> results = userAccountDao.findAll(page);
+    assertEquals("bcosby", results.get(0).getUserName());
+
+    page.setSortDirection(false);
+    results = userAccountDao.findAll(page);
+    assertEquals("smartin", results.get(0).getUserName());
+
   }
 }

@@ -1,9 +1,9 @@
 package com.upgradingdave.jdbc.dao;
 
-import com.upgradingdave.models.Filter;
 import com.upgradingdave.models.Model;
 import com.upgradingdave.models.ModelDao;
 import com.upgradingdave.models.PageContext;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -82,14 +82,6 @@ public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDa
     }
   }
 
-  /**
-   * Filters should looks something like this:
-   * {
-   *   key: 'name',
-   *   value: '%P%',
-   *   keyType: 'string'
-   * }
-   */
   private String whereClauseFromFilters(List<Map<String, String>> filters) {
     StringBuilder sb = new StringBuilder();
     if(filters != null && filters.size() > 0) {
@@ -97,19 +89,8 @@ public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDa
       for(Map<String, String> filter : filters) {
         sb.append("(");
 
-        String key = filter.get("key");
-        String val = filter.get("value");
-        String keyType = filter.get("keyType");
-        if(keyType == null) {
-          keyType = "string";
-        }
-
-        sb.append(key).append("=");
-
-        if(keyType=="string"){
-          sb.append("'").append(val).append("'");
-        } else {
-          sb.append(val);
+        for(String key : filter.keySet()) {
+          sb.append(key).append("=").append(filter.get(key));
         }
 
         sb.append(") ");
@@ -118,7 +99,7 @@ public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDa
     return sb.toString();
   }
 
-  public List<T> findAll(PageContext page) {
+  public List<T> findAll(PageContext<List<Map<String, String>>, List<String>> page) {
     log.debug("Attempting to find all with limit {}, offset {}", page.getSize(), page.getPage()*page.getSize());
 
     List<Map<String, String>> filters = page.getFilters();
@@ -128,10 +109,12 @@ public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDa
 
     StringBuilder orderedBy = new StringBuilder("");
     if(page.getSortOrder() != null) {
-      orderedBy.append("BY ").append(page.getSortOrder());
+      orderedBy.append("ORDER BY ").append(StringUtils.join(page.getSortOrder(), " ")).append(" ").append(orderDirection);
+    } else {
+      orderedBy.append("ORDER BY ID ").append(orderDirection);
     }
 
-    return getJdbcTemplate().query(String.format("SELECT * FROM %s %s LIMIT %d OFFSET %d", getTableName(), where,  page.getSize(), page.getPage()*page.getSize()),
+    return getJdbcTemplate().query(String.format("SELECT * FROM %s %s %s LIMIT %d OFFSET %d", getTableName(), where, orderedBy, page.getSize(), page.getPage()*page.getSize()),
             BeanPropertyRowMapper.newInstance(getClazz()));
   }
 

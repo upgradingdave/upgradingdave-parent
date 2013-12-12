@@ -1,6 +1,7 @@
 package com.upgradingdave.models;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ModelDao<T, ID> {
 
@@ -12,7 +13,7 @@ public interface ModelDao<T, ID> {
 
     T findById(ID id);
 
-    List<T> findAll(PageContext page);
+    List<T> findAll(PageContext<List<Map<String, String>>, List<String>> page);
 
     long getTotal();
 
