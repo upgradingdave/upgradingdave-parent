@@ -14,84 +14,92 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class ModelDaoTest<T extends Model<ID>,ID> {
 
-    public abstract ModelDao<T, ID> getModelDao();
+  public abstract ModelDao<T, ID> getModelDao();
 
-    public abstract Class getClazz();
+  public abstract Class getClazz();
 
-    List<T> testModels;
+  public abstract String getFixturePath();
 
-    public List<T> getTestModels() {
-        return testModels;
+  List<T> testModels;
+
+  public List<T> getTestModels() {
+    return testModels;
+  }
+
+  private static boolean resetDb = true;
+
+
+  @Before
+  public void setUp() {
+
+    if (resetDb) {
+      removeAll();
     }
 
-    @Before
-    public void setUp() {
+    testModels = new ArrayList<T>();
 
-        deleteAll();
+    JsonFixture<T> jsonFixture = new JsonFixture<T>(getClazz());
+    jsonFixture.eachFixtureFromFile(getFixturePath(), new FixtureProcessor<T>() {
+      @Override
+      public void process(T model) {
+        try {
 
-        testModels = new ArrayList<T>();
+          if (resetDb) {
+            model = getModelDao().create(model);
+          }
 
-        JsonFixture<T> jsonFixture = new JsonFixture<T>(getClazz());
+          testModels.add(model);
 
-        jsonFixture.withEachFixtureFromFile(new FixtureProcessor<T>() {
-            @Override
-            public void process(T user) {
-                testModels.add(getModelDao().create(user));
-            }
-        });
-
-        assertTrue(testModels.size()>0);
-
-    }
-
-    @After
-    public void tearDown(){
-
-    }
-
-    public void deleteAll(){
-
-        List<T> allModels = getModelDao().findAll(new PageImpl(0, 1000));
-        for(T model : allModels) {
-            getModelDao().delete(model);
+        } catch (Exception e) {
+          throw new AssertionError(e);
         }
+      }
+    });
 
-    }
+    this.resetDb = false; // only resetDb before first test.
 
-//    @After
-//    public void tearDown(){
-//
-//        for(T model : testModels) {
-//            getModelDao().delete(model);
-//        }
-//
-//    }
+    assertTrue(testModels.size() > 0);
 
-    @Test
-    public void findById(){
+  }
 
-        Model<ID> model = testModels.get(0);
-        Model result = getModelDao().findById(model.getId());
-        assertEquals(model, result);
+  @After
+  public void tearDown(){
+    //removeAll();
+  }
 
-    }
+  public void removeAll() {
+    JsonFixture<T> jsonFixture = new JsonFixture<T>(getClazz());
+    jsonFixture.eachFixtureFromFile(getFixturePath(), new FixtureProcessor<T>() {
+      @Override
+      public void process(T t) {
+        getModelDao().delete(t);
+      }
+    });
+  }
 
-    @Test
-    public void findAll(){
+  @Test
+  public void findById(){
 
-        PageContext pageContext = new PageImpl(0,1);
-        List<T> results = getModelDao().findAll(pageContext);
-        assertTrue(results.size() == 1);
+    Model<ID> model = testModels.get(0);
+    Model result = getModelDao().findById(model.getId());
+    assertEquals(model, result);
 
-        pageContext = new PageImpl(1,1);
-        results = getModelDao().findAll(pageContext);
-        assertTrue(results.size() == 1);
+  }
 
-    }
+  @Test
+  public void findAll(){
 
-    @Test
-    public abstract void update();
+    PageContext pageContext = new PageImpl(0,1);
+    List<T> results = getModelDao().findAll(pageContext);
+    assertTrue(results.size() == 1);
 
+    // Test Paging
+    pageContext = new PageImpl(1,1);
+    results = getModelDao().findAll(pageContext);
+    assertTrue(results.size() == 1);
+  }
 
+  @Test
+  public abstract void update();
 
 }

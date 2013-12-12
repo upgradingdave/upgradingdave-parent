@@ -1,25 +1,27 @@
 package com.upgradingdave.models;
 
-import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+import java.util.Map;
 
-public class PageImpl implements PageContext<List<Filter>, List<String>> {
+/**
+ * Simple implementation of pageContext. For filters, expects a list of maps with string key/value pairs.
+ * Will also accept a string formatted like so: key:value,key:value.
+ */
+public class PageImpl implements PageContext<List<Map<String, String>>, List<String>> {
 
   int page;
   int size;
-  String sortedBy;
+  List<String> sortOrder;
   Boolean sortDirection;  //true for low to high (e.g. A-Z, 1-10), false for reverse
-  String filterBy;
+  List<Map<String, String>> filters;
 
   public PageImpl(int page, int size) {
 
     if(page < 0 || size < 0) {
       throw new IllegalStateException("Page number and size of results must be >= 0");
     }
-
     this.page = page;
     this.size = size;
   }
@@ -29,11 +31,9 @@ public class PageImpl implements PageContext<List<Filter>, List<String>> {
     if(page < 0 || size < 0) {
       throw new IllegalStateException("Page number and size of results must be >= 0");
     }
-
     this.page = page;
     this.size = size;
-    this.sortedBy = sortedBy;
-
+    this.sortOrder = parseSortOrder(sortedBy);
   }
 
   public PageImpl(int page, int size, String sortedBy, String filteredBy) {
@@ -44,24 +44,20 @@ public class PageImpl implements PageContext<List<Filter>, List<String>> {
 
     this.page = page;
     this.size = size;
-    this.sortedBy = sortedBy;
-    this.filterBy = filteredBy;
+    this.sortOrder = parseSortOrder(sortedBy);
+    this.filters = parseFilterString(filteredBy);
 
   }
 
   public int getEnd(){
-
     return ((page+1) * size)-1;
-
   }
 
   /**
    * Start is zero index based. For ex, if page=2, size=10, then start is 20
    */
   public int getStart(){
-
     return ((page+1) * size) - size;
-
   }
 
   @Override
@@ -75,25 +71,11 @@ public class PageImpl implements PageContext<List<Filter>, List<String>> {
   }
 
   /**
-   * This implementation assume that sort order will be a comma delimited string of fields to sort by.
+   * This implementation assumes that sort order will be a comma delimited string of fields to sort by.
    */
   @Override
-  public List getSortOrder() {
-
-    List<String> result = new ArrayList<String>();
-
-    if(sortedBy != null && sortedBy.length()>0) {
-
-      String[] split = sortedBy.split(",");
-      for(int i=0;i<split.length;i++) {
-        if(split[i].length()>0 && split[i] != null) {
-          result.add(split[i]);
-        }
-      }
-
-    }
-
-    return result;
+  public List<String> getSortOrder() {
+    return sortOrder;
   }
 
   public void setSortDirection(Boolean sortDirection) {
@@ -110,78 +92,86 @@ public class PageImpl implements PageContext<List<Filter>, List<String>> {
   }
 
   @Override
-  public List getFilters() {
+  public List<Map<String, String>> getFilters() {
+    return filters;
+  }
 
-    List<Filter> result = new ArrayList<Filter>();
+  /**
+   * Parse a comma delimited key:value pair string into a List<Map<String,String>>
+   */
+  private List<Map<String, String>> parseFilterString(String filterByString) {
 
-    if(filterBy != null && filterBy.length()>0) {
+    List<Map<String, String>> results = new ArrayList<Map<String, String>>();
 
-      String[] split = filterBy.split(",");
-      for(int i=0;i<split.length;i++) {
-        if(split[i].length()>0 && split[i] != null) {
+    if(filterByString != null && filterByString.length() > 0) {
 
-          String[] pair = split[i].split(":");
+      String[] splitted = filterByString.split(",");
 
+      for(String kv : splitted) {
+
+        Map<String, String> filter = new HashMap<String, String>();
+
+        if(kv != null && kv.length()>0) {
+          String[] pair = kv.split(":");
           if(pair!= null && pair.length == 2) {
-            result.add(new FilterImpl(pair[0], pair[1]));
+            filter.put(pair[0], pair[1]);
+            results.add(filter);
           }
-
         }
       }
-
     }
+    return results;
+  }
 
+  /**
+   * Parse comma delimited string to a List<String>
+   */
+  private List<String> parseSortOrder(String sortedBy) {
+    List<String> result = new ArrayList<String>();
+
+    if(sortedBy != null && sortedBy.length()>0) {
+
+      String[] split = sortedBy.split(",");
+      for(String next : split) {
+        if(next != null && next.length()>0) {
+          result.add(next);
+        }
+      }
+    }
     return result;
-
   }
 
   @Override
-  public boolean equals(Object o){
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
-    if(this == o) {
-      return true;
-    }
+    PageImpl page1 = (PageImpl) o;
 
-    if(!(o instanceof PageImpl)){
-      return false;
-    }
-
-    PageImpl model = (PageImpl)o;
-
-    return (this.page == model.page)
-      && (this.size == model.size)
-      && (this.sortedBy == null ? model.sortedBy == null : this.sortedBy.equals(model.sortedBy))
-      && (this.sortDirection == null ? model.sortDirection == null : this.sortDirection.equals(model.sortDirection))
-      && (this.filterBy == null ? model.filterBy == null : this.filterBy.equals(model.filterBy));
-
+    return page == page1.page && size == page1.size
+            && !(filters != null ? !filters.equals(page1.filters) : page1.filters != null)
+            && !(sortDirection != null ? !sortDirection.equals(page1.sortDirection) : page1.sortDirection != null)
+            && !(sortOrder != null ? !sortOrder.equals(page1.sortOrder) : page1.sortOrder != null);
   }
 
   @Override
   public int hashCode() {
-
-    int hash = 7;
-    hash = 31 * hash + page;
-    hash = 31 * hash + size;
-    hash = 31 * hash + (null == sortedBy ? 0 : sortedBy.hashCode());
-    hash = 31 * hash + (null == sortDirection ? 0 : sortDirection.hashCode());
-    hash = 31 * hash + (null == filterBy ? 0 : filterBy.hashCode());
-
-    return hash;
-
+    int result = page;
+    result = 31 * result + size;
+    result = 31 * result + (sortOrder != null ? sortOrder.hashCode() : 0);
+    result = 31 * result + (sortDirection != null ? sortDirection.hashCode() : 0);
+    result = 31 * result + (filters != null ? filters.hashCode() : 0);
+    return result;
   }
 
   @Override
-  public String toString(){
-
-    StringBuilder builder = new StringBuilder();
-    builder.append("[");
-    builder.append(" page: "+ page);
-    builder.append(" size: "+ size);
-    builder.append(this.sortedBy == null ? " sortedby: null" : " sortedby: "+sortedBy);
-    builder.append(this.sortDirection == null ? " sortDirection: null" : " sortDirection: "+sortDirection);
-    builder.append(this.filterBy == null ? " filterBy: null" : " filterBy: "+filterBy);
-
-    return builder.toString();
+  public String toString() {
+    return "PageImpl{" +
+            "page=" + page +
+            ", size=" + size +
+            ", sortOrder=" + sortOrder +
+            ", sortDirection=" + sortDirection +
+            ", filters=" + filters +
+            '}';
   }
-
 }

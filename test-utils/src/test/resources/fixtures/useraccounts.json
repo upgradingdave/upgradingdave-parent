@@ -1,0 +1,15 @@
+[{
+  "id": 1,
+  "userName":"bcosby",
+  "password":"jello",
+  "email":"bcosby@gmail.com",
+  "createDate":"2012-07-03 21:06:48",
+  "lastUpdateDate":"2012-07-03 21:06:48"
+},{
+  "id": 2,
+  "userName":"smartin",
+  "password":"",
+  "email":"smartin@gmail.com",
+  "createDate":"2010-08-02 09:04:08",
+  "lastUpdateDate":"2010-08-02 09:04:08"
+}]

@@ -1,5 +1,6 @@
 package com.upgradingdave.jdbc.dao;
 
+import com.upgradingdave.models.Filter;
 import com.upgradingdave.models.Model;
 import com.upgradingdave.models.ModelDao;
 import com.upgradingdave.models.PageContext;
@@ -15,6 +16,7 @@ import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDaoSupport implements ModelDao<T, ID> {
 
@@ -80,11 +82,62 @@ public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDa
     }
   }
 
+  /**
+   * Filters should looks something like this:
+   * {
+   *   key: 'name',
+   *   value: '%P%',
+   *   keyType: 'string'
+   * }
+   */
+  private String whereClauseFromFilters(List<Map<String, String>> filters) {
+    StringBuilder sb = new StringBuilder();
+    if(filters != null && filters.size() > 0) {
+      sb.append("WHERE ");
+      for(Map<String, String> filter : filters) {
+        sb.append("(");
+
+        String key = filter.get("key");
+        String val = filter.get("value");
+        String keyType = filter.get("keyType");
+        if(keyType == null) {
+          keyType = "string";
+        }
+
+        sb.append(key).append("=");
+
+        if(keyType=="string"){
+          sb.append("'").append(val).append("'");
+        } else {
+          sb.append(val);
+        }
+
+        sb.append(") ");
+      }
+    }
+    return sb.toString();
+  }
+
   public List<T> findAll(PageContext page) {
     log.debug("Attempting to find all with limit {}, offset {}", page.getSize(), page.getPage()*page.getSize());
 
-    return getJdbcTemplate().query(String.format("SELECT * FROM %s LIMIT %d OFFSET %d", getTableName(), page.getSize(), page.getPage()*page.getSize()),
-      BeanPropertyRowMapper.newInstance(getClazz()));
+    List<Map<String, String>> filters = page.getFilters();
+    String where = whereClauseFromFilters(filters);
+
+    String orderDirection = page.getSortDirection() ? "ASC" : "DESC";
+
+    StringBuilder orderedBy = new StringBuilder("");
+    if(page.getSortOrder() != null) {
+      orderedBy.append("BY ").append(page.getSortOrder());
+    }
+
+    return getJdbcTemplate().query(String.format("SELECT * FROM %s %s LIMIT %d OFFSET %d", getTableName(), where,  page.getSize(), page.getPage()*page.getSize()),
+            BeanPropertyRowMapper.newInstance(getClazz()));
+  }
+
+  @Override
+  public long getTotal() {
+    return getJdbcTemplate().queryForLong(String.format("SELECT count(*) FROM %s", getTableName()));
   }
 
   public void delete(T model) {
