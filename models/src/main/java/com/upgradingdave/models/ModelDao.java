@@ -15,6 +15,6 @@ public interface ModelDao<T, ID> {
 
     List<T> findAll(PageContext<List<Map<String, String>>, List<String>> page);
 
-    long getTotal();
+    long getTotal(PageContext<List<Map<String, String>>, List<String>> page);
 
 }

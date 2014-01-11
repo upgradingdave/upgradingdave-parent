@@ -1,13 +1,21 @@
 package com.upgradingdave.models;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Simple implementation of pageContext. For filters, expects a list of maps with string key/value pairs.
- * Will also accept a string formatted like so: key:value,key:value.
+ * Simple implementation of pageContext.
+ *
+ * For filters, expects a list of maps with string key/value pairs.
+ * Will also accept a string formatted like so: [{key1:value,key1:value},{key1:value}]
+ *
+ * Implementations should treat this map so that key/value pairs inside maps get ANDed together. Maps get ORed together.
+ *
  */
 public class PageImpl implements PageContext<List<Map<String, String>>, List<String>> {
 
@@ -17,20 +25,20 @@ public class PageImpl implements PageContext<List<Map<String, String>>, List<Str
   Boolean sortDirection;  //true for low to high (e.g. A-Z, 1-10), false for reverse
   List<Map<String, String>> filters;
 
+  Gson gson;
+
   public PageImpl(int page, int size) {
 
-    if(page < 0 || size < 0) {
-      throw new IllegalStateException("Page number and size of results must be >= 0");
-    }
+    this.gson = new GsonBuilder().create();
+
     this.page = page;
     this.size = size;
   }
 
   public PageImpl(int page, int size, String sortedBy) {
 
-    if(page < 0 || size < 0) {
-      throw new IllegalStateException("Page number and size of results must be >= 0");
-    }
+    this.gson = new GsonBuilder().create();
+
     this.page = page;
     this.size = size;
     this.sortOrder = parseSortOrder(sortedBy);
@@ -38,15 +46,12 @@ public class PageImpl implements PageContext<List<Map<String, String>>, List<Str
 
   public PageImpl(int page, int size, String sortedBy, String filteredBy) {
 
-    if(page < 0 || size < 0) {
-      throw new IllegalStateException("Page number and size of results must be >= 0");
-    }
+    this.gson = new GsonBuilder().create();
 
     this.page = page;
     this.size = size;
     this.sortOrder = parseSortOrder(sortedBy);
     this.filters = parseFilterString(filteredBy);
-
   }
 
   public int getEnd(){
@@ -101,26 +106,9 @@ public class PageImpl implements PageContext<List<Map<String, String>>, List<Str
    */
   private List<Map<String, String>> parseFilterString(String filterByString) {
 
-    List<Map<String, String>> results = new ArrayList<Map<String, String>>();
+    List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+    return gson.fromJson(filterByString, result.getClass());
 
-    if(filterByString != null && filterByString.length() > 0) {
-
-      String[] splitted = filterByString.split(",");
-
-      for(String kv : splitted) {
-
-        Map<String, String> filter = new HashMap<String, String>();
-
-        if(kv != null && kv.length()>0) {
-          String[] pair = kv.split(":");
-          if(pair!= null && pair.length == 2) {
-            filter.put(pair[0], pair[1]);
-            results.add(filter);
-          }
-        }
-      }
-    }
-    return results;
   }
 
   /**

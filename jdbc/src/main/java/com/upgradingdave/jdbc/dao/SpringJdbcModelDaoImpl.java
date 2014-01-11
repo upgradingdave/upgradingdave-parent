@@ -6,6 +6,8 @@ import com.upgradingdave.models.PageContext;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -70,9 +72,19 @@ public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDa
 
     String sql = String.format(getUpdateSql(getClazz(), Arrays.asList("ID")), getTableName());
 
-    SqlParameterSource parameters = new BeanPropertySqlParameterSource(model);
+    // Build list of values using reflection
+    Field[] fields = getClazz().getDeclaredFields();
+    Object[] values = new Object[fields.length + 1];
 
-    int result = getJdbcTemplate().update(sql, parameters);
+    BeanWrapper wrapper = PropertyAccessorFactory.forBeanPropertyAccess(model);
+    int count = 0;
+    for(Field f : fields) {
+      values[count] = wrapper.getPropertyValue(f.getName());
+      count = count +1;
+    }
+    values[count] = wrapper.getPropertyValue("id");
+
+    int result = getJdbcTemplate().update(sql, values);
 
     if(result == 1) {
       return model;
@@ -80,23 +92,6 @@ public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDa
       log.error("Update was not successful: {}", sql);
       return null;
     }
-  }
-
-  private String whereClauseFromFilters(List<Map<String, String>> filters) {
-    StringBuilder sb = new StringBuilder();
-    if(filters != null && filters.size() > 0) {
-      sb.append("WHERE ");
-      for(Map<String, String> filter : filters) {
-        sb.append("(");
-
-        for(String key : filter.keySet()) {
-          sb.append(key).append("=").append(filter.get(key));
-        }
-
-        sb.append(") ");
-      }
-    }
-    return sb.toString();
   }
 
   public List<T> findAll(PageContext<List<Map<String, String>>, List<String>> page) {
@@ -119,8 +114,12 @@ public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDa
   }
 
   @Override
-  public long getTotal() {
-    return getJdbcTemplate().queryForLong(String.format("SELECT count(*) FROM %s", getTableName()));
+  public long getTotal(PageContext<List<Map<String, String>>, List<String>> page) {
+
+    List<Map<String, String>> filters = page.getFilters();
+    String where = whereClauseFromFilters(filters);
+
+    return getJdbcTemplate().queryForLong(String.format("SELECT count(*) FROM %s %s", getTableName(), where));
   }
 
   public void delete(T model) {
@@ -128,32 +127,58 @@ public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDa
     getJdbcTemplate().execute(String.format("DELETE FROM %s WHERE ID = %d", getTableName(), model.getId()));
   }
 
+  private String whereClauseFromFilters(List<Map<String, String>> filters) {
+    StringBuilder sb = new StringBuilder();
+
+    if(filters != null && filters.size() > 0) {
+      sb.append("WHERE ");
+      int filterCount = 0;
+      for(Map<String, String> filter : filters) {
+        if(filterCount > 0) {
+          sb.append("OR ");
+        }
+        sb.append("(");
+
+        for(String key : filter.keySet()) {
+          sb.append(key).append("=").append(filter.get(key));
+        }
+
+        sb.append(") ");
+        filterCount++;
+      }
+    }
+    return sb.toString();
+  }
+
   private String getUpdateSql(Class clazz, List<String> whereClauseKeys){
 
     StringBuilder sqlBuilder = new StringBuilder("UPDATE %s SET ");
 
-    boolean first = true;
+    Field[] fields = clazz.getDeclaredFields();
+    String[] values = new String[fields.length + 1];
+
+    int count = 0;
     for (Field field : clazz.getDeclaredFields()) {
-      if (!first) {
+      if (count > 0) {
         sqlBuilder.append(", ");
       }
-      first = false;
 
       sqlBuilder.append(field.getName().toUpperCase());
       sqlBuilder.append(" = ?");
+
+      count = count +1;
     }
 
-    first = true;
+    count = 0;
     for (String key : whereClauseKeys) {
-      if (first) {
+      if (count <= 0) {
         sqlBuilder.append(" WHERE ");
       } else {
         sqlBuilder.append(" AND ");
       }
-      first = false;
-
       sqlBuilder.append(key.toUpperCase());
       sqlBuilder.append(" = ?");
+      count++;
     }
 
     return sqlBuilder.toString();
