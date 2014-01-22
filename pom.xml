@@ -19,7 +19,6 @@
     <module>jdbc</module>
     <module>jaxb-tools</module>
     <module>test-utils</module>
-    <module>webtest</module>
   </modules>
 
   <properties>
