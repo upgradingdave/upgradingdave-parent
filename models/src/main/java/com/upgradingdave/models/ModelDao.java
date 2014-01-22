@@ -1,20 +1,19 @@
 package com.upgradingdave.models;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ModelDao<T, ID> {
 
-    T create(T model);
+  T create(T model);
 
-    void delete(T model);
+  List<T> findByExample(T example, Pageable page);
 
-    T update(T model);
+  Long findCountByExample(T example);
 
-    T findById(ID id);
+  T findById(ID id);
 
-    List<T> findAll(PageContext<List<Map<String, String>>, List<String>> page);
+  void delete(T model);
 
-    long getTotal(PageContext<List<Map<String, String>>, List<String>> page);
+  T update(T model);
 
 }
