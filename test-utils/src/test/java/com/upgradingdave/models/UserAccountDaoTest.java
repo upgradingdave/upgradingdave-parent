@@ -56,10 +56,10 @@ public class UserAccountDaoTest extends ModelDaoTest<UserAccount, Integer>{
 
   @Test
   public void testFilters(){
-    List<UserAccount> results = userAccountDao.findAll(new PageImpl(0, 10, "username", "username:'bcosby'"));
+    List<UserAccount> results = userAccountDao.findAll(new PageImpl(0, 10, "username", "[{username:\"'bcosby'\"}]"));
     assertEquals("bcosby", results.get(0).getUserName());
 
-    results = userAccountDao.findAll(new PageImpl(0, 10, "username", "username:'bcosby',userName:'smartin'"));
+    results = userAccountDao.findAll(new PageImpl(0, 10, "username", "[{username:\"'bcosby'\"},{userName:\"'smartin'\"}]"));
     assertEquals(2, results.size());
   }
 
@@ -80,7 +80,7 @@ public class UserAccountDaoTest extends ModelDaoTest<UserAccount, Integer>{
     long results = userAccountDao.getTotal(new PageImpl(0, 10));
     assertEquals(2, results);
 
-    results = userAccountDao.getTotal(new PageImpl(-1, -1, "username", "username:'bcosby'"));
+    results = userAccountDao.getTotal(new PageImpl(-1, -1, "username", "[{username:\"'bcosby'\"}]"));
     assertEquals(1, results);
 
   }

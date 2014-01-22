@@ -132,19 +132,24 @@ public abstract class SpringJdbcModelDaoImpl<T extends Model, ID> extends JdbcDa
 
     if(filters != null && filters.size() > 0) {
       sb.append("WHERE ");
-      int filterCount = 0;
+      int ORFilterCount = 0;
       for(Map<String, String> filter : filters) {
-        if(filterCount > 0) {
-          sb.append("OR ");
+        if(ORFilterCount > 0 && ORFilterCount < (filters.size())) {
+          sb.append(" OR ");
         }
         sb.append("(");
 
+        int ANDFilterCount = 0;
         for(String key : filter.keySet()) {
+          if(ANDFilterCount > 0 && ANDFilterCount < (filter.keySet().size())) {
+            sb.append(" AND ");
+          }
           sb.append(key).append("=").append(filter.get(key));
+          ANDFilterCount++;
         }
 
         sb.append(") ");
-        filterCount++;
+        ORFilterCount++;
       }
     }
     return sb.toString();
